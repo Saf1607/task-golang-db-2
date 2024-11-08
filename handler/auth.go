@@ -54,7 +54,7 @@ func (a *authImplement) Login(c *gin.Context) {
 		First(&auth).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "username not valid",
+				"error": "username salah",
 			})
 			return
 		}
@@ -68,7 +68,7 @@ func (a *authImplement) Login(c *gin.Context) {
 	// Validate password
 	if err := bcrypt.CompareHashAndPassword([]byte(auth.Password), []byte(payload.Password)); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "password not valid",
+			"error": "password salah",
 		})
 		return
 	}
@@ -81,6 +81,9 @@ func (a *authImplement) Login(c *gin.Context) {
 		})
 		return
 	}
+
+	// c.SetSameSite(http.SameSiteLaxMode) // Set SameSite attribute (for cross-origin requests)
+	// c.SetCookie("auth_token", token, 1*0, "/", "", false, true)
 
 	// Success response
 	c.JSON(http.StatusOK, gin.H{

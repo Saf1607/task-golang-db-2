@@ -47,10 +47,12 @@ func main() {
 	accountRoutes.DELETE("/delete/:id", accountHandler.Delete)
 	accountRoutes.GET("/list", accountHandler.List)
 	accountRoutes.POST("/topup", accountHandler.TopUp)
-	accountRoutes.POST("/balance", accountHandler.Balance)
 
 	// middleware := middleware.AuthMiddleware(signingKey)
 	accountRoutes.GET("/my", middleware.AuthMiddleware(signingKey), accountHandler.My)
+	accountRoutes.GET("/balance", middleware.AuthMiddleware(signingKey), accountHandler.Balance)
+	accountRoutes.POST("/transfer", middleware.AuthMiddleware(signingKey), accountHandler.Transfer)
+	accountRoutes.GET("/mutation", middleware.AuthMiddleware(signingKey), accountHandler.Mutation)
 
 	// grouping route with /transaction-category
 	transaction_categoryHandler := handler.NewTransCat(db)
@@ -62,6 +64,11 @@ func main() {
 	transaction_categoryRoutes.GET("/list", transaction_categoryHandler.List)
 
 	transaction_categoryRoutes.GET("/my", middleware.AuthMiddleware(signingKey), transaction_categoryHandler.My)
+
+	transactionHandler := handler.NewTrans(db)
+	transactionRoutes := r.Group("/transaction")
+	transactionRoutes.POST("/new", transactionHandler.NewTransaction)
+	transactionRoutes.GET("/list", transactionHandler.TransactionList)
 
 	r.Run() // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
 }
